@@ -16,12 +16,13 @@ module RubyLLM
         def free_text? = kind == "string" && choices.empty?
       end
 
-      attr_reader :path, :states
+      attr_reader :path, :version, :states
 
       def initialize(path, root: Dir.pwd)
         @path = path.to_s
         file = File.expand_path(@path, root.to_s)
         manifest = Template.manifest(file, root.to_s)
+        @version = manifest["version"]
         choices = Controls.choices(File.read(file))
         @states = manifest.dig("states", "declarations").map do |declaration|
           State.new(name: declaration["name"], kind: declaration["kind"].to_s, default: declaration["value"],

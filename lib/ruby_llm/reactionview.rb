@@ -6,6 +6,7 @@ require_relative "reactionview/version"
 require_relative "reactionview/controls"
 require_relative "reactionview/template"
 require_relative "reactionview/tools"
+require_relative "reactionview/tab_view"
 
 module RubyLLM
   # Tools that let a model change what a ReActionView page shows, built from
