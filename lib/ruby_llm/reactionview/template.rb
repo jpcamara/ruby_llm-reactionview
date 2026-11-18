@@ -10,6 +10,9 @@ module RubyLLM
     #
     #   template = RubyLLM::ReActionView::Template.new("app/views/invoices/index.html.erb", root: Rails.root)
     #   chat.with_tools(*template.tools(view))
+    #
+    # A repeated template is a partial rendered once per row. Its states
+    # belong to each rendering, which the tools address like rows.
     class Template
       State = Data.define(:name, :kind, :default, :row, :choices) do
         def row? = row
@@ -18,8 +21,11 @@ module RubyLLM
 
       attr_reader :path, :version, :states
 
-      def initialize(path, root: Dir.pwd)
+      def repeated? = @repeated
+
+      def initialize(path, root: Dir.pwd, repeated: false)
         @path = path.to_s
+        @repeated = repeated
         file = File.expand_path(@path, root.to_s)
         manifest = Template.manifest(file, root.to_s)
         @version = manifest["version"]
@@ -42,13 +48,20 @@ module RubyLLM
         manifest
       end
 
+      # "invoices" for app/views/invoices/index.html.erb, "totals" for
+      # app/views/invoices/_totals.html.erb.
+      def slug
+        base = File.basename(path).sub(/\..*\z/, "").delete_prefix("_")
+        base == "index" ? File.basename(File.dirname(path)) : base
+      end
+
       def page_states = states.reject(&:row?)
       def row_states = states.select(&:row?)
       def [](name) = states.find { |state| state.name == name.to_s }
 
       # The tools for this page. `view` reads and writes the page's states;
       # see Tools for what it answers.
-      def tools(view) = Tools.for(self, view)
+      def tools(view) = Page.new([self]).tools(view)
 
       # The JSON schema for one state's value.
       def json_type(state)

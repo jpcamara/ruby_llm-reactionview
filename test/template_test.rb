@@ -36,8 +36,8 @@ class TemplateTest < Minitest::Test
 
   def test_set_view_casts_and_hands_changes_to_the_view
     assert_equal "ok", @tools["set_view"].call(status: "open", page: "2")
-    assert_equal [RubyLLM::ReActionView::Change.new(name: "status", row: nil, value: "open"),
-                  RubyLLM::ReActionView::Change.new(name: "page", row: nil, value: 2)], @view.changes
+    assert_equal [RubyLLM::ReActionView::Change.new(file: "app/views/invoices/index.html.erb", name: "status", value: "open"),
+                  RubyLLM::ReActionView::Change.new(file: "app/views/invoices/index.html.erb", name: "page", value: 2)], @view.changes
   end
 
   def test_bad_values_go_back_to_the_model
