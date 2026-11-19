@@ -1,0 +1,36 @@
+import { createRequire } from "module"
+const require = createRequire(import.meta.url)
+const { chromium } = require("playwright")
+const url = "http://localhost:3311/"
+const browser = await chromium.launch()
+const errors = []
+const open = async (name) => {
+  const ctx = await browser.newContext({ viewport: { width: 1200, height: 800 } })
+  const page = await ctx.newPage()
+  page.on("console", (m) => { if (m.type() === "error" || m.type() === "warning") errors.push(`${name}: ${m.text()}`) })
+  page.on("pageerror", (e) => errors.push(`${name} pageerror: ${e.message}`))
+  await page.goto(url)
+  await page.waitForFunction(() => document.querySelector("yrby-document")?.current, null, { timeout: 10000 })
+  return page
+}
+const a = await open("A"), b = await open("B")
+const summary = (p) => p.locator(".summary").innerText()
+const rows = (p) => p.locator("tbody tr.row").count()
+console.log("start", await summary(a), await rows(a), "|", await summary(b), await rows(b))
+await a.click("text=Overdue")
+await b.waitForTimeout(1500)
+console.log("A clicked Overdue →", await summary(a), await rows(a), "| B:", await summary(b), await rows(b))
+await b.selectOption("select", "amount")
+await a.waitForTimeout(1500)
+console.log("B sorted amount →", await summary(b), "| A:", await summary(a), "A select:", await a.locator("select").inputValue())
+const first = await a.locator("tbody tr.row").first().getAttribute("id")
+await a.click(`#${first} td >> nth=1`)
+await b.waitForTimeout(1500)
+console.log("A expanded", first, "→ A detail rows", await a.locator("tr.detail").count(), "| B detail rows", await b.locator("tr.detail").count())
+await b.fill(".search", "Pie")
+await a.waitForTimeout(1800)
+console.log("B searched Pie →", await summary(a), await rows(a), "A input:", await a.locator(".search").inputValue())
+await a.screenshot({ path: process.env.OUT + "/a.png", fullPage: true })
+await b.screenshot({ path: process.env.OUT + "/b.png", fullPage: true })
+console.log("errors:", errors.slice(0, 10))
+await browser.close()

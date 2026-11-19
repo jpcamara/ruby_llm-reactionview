@@ -1,0 +1,13 @@
+<%# herb:state (breakdown: false) %>
+<section class="totals">
+  <button class="total" data-herb-toggle="breakdown" data-open="<%= breakdown %>">
+    <span class="total-label">Total</span>
+    <span class="total-value"><%= number_to_currency(invoices.sum(&:amount)) %></span>
+    <span class="total-count"><%= pluralize(invoices.size, "invoice") %></span>
+  </button>
+  <ul class="breakdown" data-open="<%= breakdown %>">
+    <% invoices.group_by(&:status).sort.each do |status, group| %>
+      <li class="stat"><span class="status status-<%= status %>"><%= status %></span> <strong><%= number_to_currency(group.sum(&:amount)) %></strong> <span class="muted"><%= group.size %></span></li>
+    <% end %>
+  </ul>
+</section>

@@ -1,0 +1,10 @@
+/.bundle
+/log/*
+/tmp/*
+/storage/*.sqlite3*
+/config/master.key
+/public/assets
+/test/browser/node_modules
+/test/browser/demo-rec/
+/test/browser/*.png
+/test/browser/undefined/
