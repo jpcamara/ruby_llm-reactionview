@@ -30,6 +30,19 @@ states.
   refetch as usual, so your controller filters the way it does for clicks.
   The tab answers once the re-render lands.
 - Replies stream, and a conversation lasts as long as the tab's subscription.
+- `page_agent_tag` takes `title:`, `placeholder:` and `open: true`. Theme it
+  with CSS variables on the element:
+
+  ```css
+  page-agent {
+    --page-agent-accent: #4f46e5;
+    --page-agent-font: Inter, system-ui, sans-serif;
+    --page-agent-background: #fff;
+    --page-agent-color: #0f172a;
+  }
+  ```
+
+  Move it with `top`, `right`, `bottom` and `left`. It sits fixed in the bottom-right corner by default.
 
 Configure it in `config/initializers/ruby_llm_reactionview.rb`:
 
