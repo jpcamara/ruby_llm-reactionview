@@ -59,6 +59,17 @@ Use `connectPageAgent({ onDelta, onReply })` from `"ruby_llm-reactionview"`
 to build your own UI instead of `<page-agent>`. Position the element with
 page CSS, such as `page-agent { left: 16px; right: auto; }`.
 
+The browser code is split so the agent's view of the page is separate from
+the chat box:
+
+| Module | What it does |
+|---|---|
+| `page.js` | Reads and sets Herb states through `window.HerbRuntime`. No agent code. |
+| `text.js` | The text a person can see. |
+| `snapshot.js` | What an agent can see and change: `report()`, `snapshot()`, `apply()`. |
+| `channel.js` | `connectPageAgent`, the connection to `PageAgentChannel`. |
+| `element.js` | `<page-agent>`, the chat box. UI only. |
+
 The channel keeps the conversation on its instance, so it needs Action
 Cable. AnyCable builds a channel instance per command.
 
