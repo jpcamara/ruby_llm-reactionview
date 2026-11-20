@@ -85,19 +85,4 @@ class ViewTest < Minitest::Test
     assert_equal({ error: "no invoice 99" }, @tools["set_expanded"].call(rows: ["99"], value: true))
     assert_empty @hash
   end
-
-  # A Y::Map stand-in: [] []= key? keys, writes inside edit.
-  class FakeMap < Hash
-    def key?(key) = super(key)
-  end
-
-  def test_y_map_store_writes_inside_edit
-    map = FakeMap.new
-    edits = 0
-    store = R::Stores::YMap.new(map, edit: ->(&block) { edits += 1; block.call })
-    R::View.new(R::Template.new("app/views/invoices/index.html.erb", root: ROOT), store:).tools
-     .find { _1.name == "set_view" }.call(sort: "amount", query: "pie")
-    assert_equal({ "sort" => "amount", "query" => "pie" }, map.to_h)
-    assert_equal 2, edits
-  end
 end

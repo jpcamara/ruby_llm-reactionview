@@ -6,7 +6,7 @@ clicking the page's own controls.
 
 There are two ways to use it. With the page agent, the browser tab holds the
 states and you write no code. With a View, the server holds the states in a
-session, a cache, or a shared yrby document.
+session or a cache.
 
 ## The page agent
 
@@ -99,20 +99,11 @@ chat.with_tools(*view.tools)
   block returns.
 - Subclass View to refuse changes (`check(changes)`, raising InvalidValue)
   or react to them (`changed(change)`).
-- `Stores::Hash` wraps any Hash-like object. `Stores::YMap` wraps a yrby
-  `Y::Map`, or a block returning one, with an optional `edit:` for writes
-  that must be recorded, such as `edit: method(:edit)` in a `Y::Agent`.
+- `Stores::Hash` wraps any Hash-like object. A store is anything that
+  answers `read(key)`, `write(key, value)` and `keys`.
 
 Keys are `status`, `expanded@29`, and `file#name` on pages with several
-stateful templates. The browser binding uses the same keys:
-
-```js
-import { bindHerbStates } from "ruby_llm-reactionview/yjs"
-const unbind = bindHerbStates(doc.getMap("view"), { qualified: true, onChange: (change, { local }) => {} })
-```
-
-Everyone on the page, and any server-side agent writing the map, then sees
-the same view.
+stateful templates.
 
 ## Seeding
 

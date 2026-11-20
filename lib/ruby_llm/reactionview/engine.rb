@@ -4,8 +4,7 @@ require_relative "page_agent_channel" if defined?(::ActionCable)
 module RubyLLM
   module ReActionView
     # Ships the page agent to a Rails app: the channel, the JavaScript
-    # (importmap pins "ruby_llm-reactionview" and "ruby_llm-reactionview/yjs"),
-    # and the page_agent_tag helper.
+    # (importmap pin "ruby_llm-reactionview"), and the page_agent_tag helper.
     class Engine < ::Rails::Engine
       initializer "ruby_llm_reactionview.assets" do |app|
         app.config.assets.paths << root.join("app/javascript") if app.config.respond_to?(:assets)

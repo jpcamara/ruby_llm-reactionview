@@ -1,5 +1,4 @@
-// Reads and sets a ReActionView page's Herb states, for the page agent and the
-// Y.Map binding. A template rendered more than once, or inside a keyed row, is
+// Reads and sets a ReActionView page's Herb states for the page agent. A template rendered more than once, or inside a keyed row, is
 // "repeated": each rendering is addressed by its row key.
 
 const runtime = () => window.HerbRuntime
