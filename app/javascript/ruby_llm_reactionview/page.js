@@ -67,3 +67,18 @@ export function syncSelects(name, value) {
     if (select.value !== String(value)) select.value = value
   }
 }
+
+export function getValue(change) {
+  const scope = scopeOf(change)
+  return scope ? runtime().state.getState(change.name, { scope }) : undefined
+}
+
+// The file, name and row of a herb:state-change event.
+export function changeOf(detail) {
+  const template = templates().find((t) => t.file === detail.file)
+  if (template?.repeated) {
+    const region = template.regions.find((r) => r.occurrence === detail.occurrence)
+    return { file: detail.file, name: detail.name, row: region ? instanceKey(region) : String(detail.occurrence) }
+  }
+  return { file: detail.file, name: detail.name, row: detail.key ?? null }
+}
