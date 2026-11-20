@@ -107,6 +107,9 @@ end
 chat.with_tools(*view.tools)
 ```
 
+`PageAgent` below is a complete transport over Action Cable, and a worked
+example of this.
+
 The tab only names its templates. The tools are built from those files on
 disk, so a tab can't widen what the model may set. Files outside `app/views`,
 more than 20 templates, and stale versions are refused.
@@ -126,6 +129,59 @@ await apply(changes) // answer to "set": sets the states, waits for the re-rende
 | `page.js` | Reads and sets Herb states through `window.HerbRuntime`. No agent code. |
 | `text.js` | The text a person can see. |
 | `snapshot.js` | `report()`, `snapshot()` and `apply()`. |
+
+## The page agent
+
+A ready-made agent built on TabView: a chat box in the tab and an Action Cable
+channel that runs the model. It's optional. Nothing in the core loads its
+JavaScript unless you import it.
+
+```sh
+bin/rails generate ruby_llm_reactionview:page_agent
+```
+
+This writes `config/initializers/ruby_llm_reactionview_page_agent.rb`, imports
+`ruby_llm-reactionview/page-agent` in `application.js`, and pins
+`@rails/actioncable` if it's missing. Then put `<%= page_agent_tag %>` in a
+layout or view.
+
+```ruby
+RubyLLM::ReActionView::PageAgent.configure do |config|
+  config.chat = -> { RubyLLM.chat(model: "gpt-5-mini") }
+  config.instructions = "..."                       # the system prompt; the default asks for short, plain replies
+  config.authorize = -> { current_user.present? }   # runs in the channel
+end
+```
+
+- Without `authorize`, the agent is allowed everywhere except production.
+- Each question carries the tab's `report()`. The channel builds a TabView
+  from it and sends tool calls back to the tab. Replies stream, and the
+  conversation lasts as long as the tab's subscription.
+- The tools are replaced on each question, because the page may have
+  changed, with `chat.with_tools(nil).with_tools(*view.tools)`. That also
+  clears any tools `config.chat` adds.
+- `page_agent_tag` takes `title:`, `placeholder:` and `open: true`. Theme the
+  element with CSS variables, and move it with `top`, `right`, `bottom` and
+  `left` (it sits in the bottom-right corner by default):
+
+  ```css
+  page-agent {
+    --page-agent-accent: #4f46e5;
+    --page-agent-font: Inter, system-ui, sans-serif;
+    --page-agent-background: #fff;
+    --page-agent-color: #0f172a;
+  }
+  ```
+
+- For your own UI, use `connectPageAgent({ onDelta, onReply })` from
+  `"ruby_llm-reactionview/page-agent"`.
+
+| File | What it does |
+|---|---|
+| `page_agent.rb` | `PageAgent.configure` and its settings. |
+| `page_agent/channel.rb` | `PageAgent::Channel`: builds the TabView, runs the chat in a thread, streams the reply. |
+| `page_agent/channel.js` | `connectPageAgent`: sends questions, answers tool calls with `snapshot()` and `apply()`. |
+| `page_agent/element.js` | `<page-agent>`, the chat box. UI only. |
 
 ## Seeding
 
@@ -168,7 +224,8 @@ this gem uses from Herb isn't documented yet. Check these when upgrading.
 |---|---|
 | `RubyLLM::Tool` subclasses built per template with `Class.new`, each declaring a JSON schema with `parameters(...)` | `tools.rb` |
 | `Tool#call` is wrapped to turn `ArgumentError` and `TypeError`, including RubyLLM's own argument errors, into an `{ error: }` result the model can act on | `tools.rb` |
-| `chat.with_tools(nil).with_tools(*new)` to replace a chat's tools, as RubyLLM documents | apps using `TabView` per request |
+| `chat.with_tools(nil).with_tools(*new)` to replace a chat's tools, as RubyLLM documents | `page_agent/channel.rb` |
+| `chat.ask(prompt) { \|chunk\| ... }` to stream, and `with_instructions` | `page_agent/channel.rb` |
 
 ## Known limits
 
@@ -184,5 +241,9 @@ this gem uses from Herb isn't documented yet. Check these when upgrading.
   to land before answering. On a runtime without it, `apply()` falls back to
   waiting for `herb:slot-update` or 300 ms, and the model may see rows from
   before a slow refetch.
+- **The page agent needs Action Cable.** The conversation lives on the
+  channel instance, and AnyCable builds one per command.
+- **The page agent has no hook for your own tools.** Tools from `config.chat`
+  are cleared on each question along with the page's old ones.
 
 Requires Herb 0.11, ReActionView 0.6 and RubyLLM 2.x.
