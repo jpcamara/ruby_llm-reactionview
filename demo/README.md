@@ -34,5 +34,6 @@ node seed.mjs    # first paint is the shared view
 node tab.mjs     # <page-agent>: streaming, history, the other tab follows
 node agent.mjs   # the yrby ViewAgent
 node cards.mjs   # pinning per-row partials
+node apply.mjs   # apply() answers after a server refetch lands (no LLM)
 node demo.mjs    # records the two-tab demo video into demo-rec/
 ```
