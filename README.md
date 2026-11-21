@@ -92,6 +92,9 @@ chat.ask("Show overdue invoices, biggest first")
 - `Stores::Hash` wraps any Hash-like object. A store is anything that answers
   `read(key)`, `write(key, value)` and `keys`. Keys are `status`,
   `expanded@29`, and `file#name` on pages with several stateful templates.
+- `Stores::YMap` wraps a yrby `Y::Map`, or a block returning one, with an
+  optional `edit:` for writes that must be recorded, such as
+  `edit: method(:edit)` in a `Y::Agent`. See Yjs below.
 
 ### In the browser tab: TabView
 
@@ -183,6 +186,23 @@ end
 | `page_agent/channel.js` | `connectPageAgent`: sends questions, answers tool calls with `snapshot()` and `apply()`. |
 | `page_agent/element.js` | `<page-agent>`, the chat box. UI only. |
 
+## Yjs
+
+To share a page's states through a yrby document, so every tab and any
+server-side agent see the same view, bind them to a `Y.Map` in the browser
+and give server-side Views a `Stores::YMap` over the same map:
+
+```js
+import { bindHerbStates } from "ruby_llm-reactionview/yjs"
+const unbind = bindHerbStates(doc.getMap("view"), { qualified: true, onChange: (change, { local }) => {} })
+```
+
+The binding uses the same keys as the server, writes with the `"herb"`
+origin and skips its own writes, and re-applies values after each slot
+update. It also applies the map's values when it starts, so row states that
+seeding can't cover come back after a full page load, just after the first
+paint.
+
 ## Seeding
 
 So a page renders with the states the server holds, not the template
@@ -215,7 +235,8 @@ this gem uses from Herb isn't documented yet. Check these when upgrading.
 | `@__herb_state_overrides` (filled by Seeding) | `seeding.rb` | Internal to ReActionView 0.6 |
 | `window.HerbRuntime.state`: `manifestFor`, `getState`, `setState` with a `{ region, item }` scope | `page.js`, `snapshot.js` | Not documented (the documented API is `useState(this)` for Stimulus) |
 | `window.HerbRuntime.slots`: `regions`, `itemsFor`, and a region's `file`, `version`, `occurrence`, `item`, `ranges` | `page.js`, `snapshot.js` | Not documented |
-| The `herb:slot-update` event | `snapshot.js` | Not documented |
+| The `herb:slot-update` event | `snapshot.js`, `y_binding.js` | Not documented |
+| The `herb:state-change` event (`name`, `value`, `file`, `occurrence`, `key`) | `y_binding.js` | Not documented |
 | `HerbRuntime.state.refetch` (`timer`, `request`) and `state.options.refetchDebounce`, to wait for a server refetch | `snapshot.js` | Internal; `apply()` falls back without it |
 
 **RubyLLM**

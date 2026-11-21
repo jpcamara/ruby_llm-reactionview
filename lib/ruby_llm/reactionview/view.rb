@@ -1,7 +1,7 @@
 module RubyLLM
   module ReActionView
     # A view kept in a store, for when the page's states live somewhere the
-    # server can read, such as a session or a cache.
+    # server can read: a session, a cache, or a yrby document.
     #
     #   view = RubyLLM::ReActionView::View.new(template, store: Stores::Hash.new(session[:herb_states] ||= {})) do |states|
     #     { rows: Invoice.view(**states.symbolize_keys).limit(40).as_json }
