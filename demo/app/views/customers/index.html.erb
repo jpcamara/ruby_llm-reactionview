@@ -1,0 +1,16 @@
+<%# herb:slots client %>
+<main class="page">
+  <header class="top">
+    <div>
+      <h1>Customers</h1>
+      <p class="summary">Total billed per customer. Pin the ones to watch.</p>
+    </div>
+  </header>
+  <div class="cards">
+    <% @customers.each do |name, total| %>
+      <%# herb:key name.parameterize %>
+      <%= render "customers/card", name:, total: %>
+    <% end %>
+  </div>
+</main>
+<%= page_agent_tag open: true, placeholder: "Pin whoever owes the most" %>

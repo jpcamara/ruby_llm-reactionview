@@ -268,3 +268,10 @@ this gem uses from Herb isn't documented yet. Check these when upgrading.
   are cleared on each question along with the page's old ones.
 
 Requires Herb 0.11, ReActionView 0.6 and RubyLLM 2.x.
+
+## Demo
+
+`demo/` is a Rails app that uses the gem on two pages. On the invoices page,
+a yrby agent and a per-tab `<page-agent>` share one view. On the customers
+page, a partial rendered once per row is pinned by its key. Its README covers
+running it and its Playwright scripts.

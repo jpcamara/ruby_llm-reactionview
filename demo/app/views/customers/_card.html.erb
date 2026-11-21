@@ -1,0 +1,10 @@
+<%# herb:state (pinned: false) %>
+<article class="card" data-pinned="<%= pinned %>">
+  <div class="card-head">
+    <span class="initials"><%= name.scan(/\b[[:alpha:]]/).first(2).join %></span>
+    <button class="pin" data-herb-toggle="pinned" aria-pressed="<%= pinned %>"><span class="pin-off">Pin</span><span class="pin-on">Pinned</span></button>
+  </div>
+  <h2><%= name %></h2>
+  <p class="card-label">Billed</p>
+  <p class="card-value"><%= number_to_currency(total) %></p>
+</article>

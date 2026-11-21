@@ -1,0 +1,80 @@
+<%# herb:slots client %>
+<%# herb:state (status: "all", sort: "due", query: "") %>
+
+<main class="page">
+  <header class="top">
+    <div>
+      <h1>Invoices</h1>
+      <p class="summary">Showing <strong><%= status.humanize.downcase %></strong> invoices, sorted by <strong><%= sort.humanize.downcase %></strong><% if query != "" %>, matching “<%= query.strip %>”<% end %></p>
+    </div>
+    <div id="people" class="people" aria-label="People on this page"></div>
+  </header>
+
+  <nav class="filters">
+    <div class="segmented" role="group" aria-label="Status">
+      <%# Literal values, so the agent's tools can read them. %>
+      <button class="chip<%= " is-active" if status == "all" %>" data-herb-set="status=all">All</button>
+      <button class="chip<%= " is-active" if status == "draft" %>" data-herb-set="status=draft">Draft</button>
+      <button class="chip<%= " is-active" if status == "open" %>" data-herb-set="status=open">Open</button>
+      <button class="chip<%= " is-active" if status == "overdue" %>" data-herb-set="status=overdue">Overdue</button>
+      <button class="chip<%= " is-active" if status == "paid" %>" data-herb-set="status=paid">Paid</button>
+    </div>
+
+    <label class="sort">Sort by
+      <select data-herb-set="sort=$value">
+        <option value="due"<%= " selected" if sort == "due" %>>Due date</option>
+        <option value="amount"<%= " selected" if sort == "amount" %>>Amount</option>
+        <option value="customer"<%= " selected" if sort == "customer" %>>Customer</option>
+        <option value="number"<%= " selected" if sort == "number" %>>Number</option>
+      </select>
+    </label>
+
+    <input class="search" type="search" placeholder="Search customer or number" value="<%= query %>" data-herb-set="query=$value" data-herb-debounce="250">
+  </nav>
+
+  <%= render "invoices/totals", invoices: @invoices %>
+
+  <%# The controller filters by these, so the page reads each on the server
+      (humanize, strip) to have Herb refetch when they change, including when
+      query goes back to empty. Herb has no way yet to say "the controller
+      reads this state". %>
+  <div class="table-card">
+    <table class="invoices" data-query="<%= query.strip %>">
+      <thead>
+        <tr><th>Number</th><th>Customer</th><th>Status</th><th>Due</th><th class="num">Amount</th></tr>
+      </thead>
+      <tbody>
+        <% @invoices.each do |invoice| %>
+          <%# herb:key invoice.id %>
+          <%# herb:state (expanded: false) %>
+          <tr id="invoice_<%= invoice.id %>" class="row" data-open="<%= expanded %>" data-herb-toggle="expanded">
+            <td class="mono"><%= invoice.number %></td>
+            <td class="strong"><%= invoice.customer %></td>
+            <td><span class="status status-<%= invoice.status %>"><%= invoice.status %></span></td>
+            <td class="muted"><%= invoice.due_on.strftime("%b %-d") %></td>
+            <td class="num"><%= number_to_currency(invoice.amount) %></td>
+          </tr>
+          <tr class="detail" data-open="<%= expanded %>"><td colspan="5"><span class="detail-label">Issued <%= invoice.issued_on.strftime("%b %-d, %Y") %></span> <%= invoice.notes %></td></tr>
+        <% end %>
+      </tbody>
+    </table>
+    <% if @invoices.empty? %><p class="empty">No invoices match.</p><% end %>
+  </div>
+
+  <%= collaborative_document_tag @workspace, :view, data: { shared_view: "status sort query expanded breakdown" } %>
+</main>
+
+<aside class="asks">
+  <div class="asks-head">
+    <h2>Team agent</h2>
+    <p>Asks here are shared with everyone on this page.</p>
+  </div>
+  <ol id="asks" class="ask-list"></ol>
+  <form id="ask-form" class="ask-form">
+    <input id="ask-input" autocomplete="off" placeholder="Show overdue invoices, biggest first">
+    <button>Ask</button>
+  </form>
+  <button id="invite" class="invite" data-url="<%= agent_path %>">Invite the agent</button>
+</aside>
+<%= page_agent_tag title: "Ask about just this tab", placeholder: "Open the largest overdue invoice" %>
+<div id="toast" class="toast" hidden></div>
