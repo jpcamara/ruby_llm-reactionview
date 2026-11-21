@@ -11,6 +11,7 @@ require_relative "reactionview/tools"
 require_relative "reactionview/stores"
 require_relative "reactionview/view"
 require_relative "reactionview/tab_view"
+require_relative "reactionview/page_agent"
 require_relative "reactionview/engine" if defined?(Rails::Engine)
 
 module RubyLLM
