@@ -1,4 +1,4 @@
-// <page-agent>: a chat box for the page agent. UI only; the agent itself is
+// <page-agent>: a chat box for the page agent, connected through
 // connectPageAgent in page_agent/channel.js. Put page_agent_tag in a view to use it.
 import { connectPageAgent } from "ruby_llm_reactionview/page_agent/channel"
 

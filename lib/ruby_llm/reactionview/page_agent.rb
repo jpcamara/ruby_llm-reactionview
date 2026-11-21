@@ -2,8 +2,8 @@ module RubyLLM
   module ReActionView
     # A ready-made agent for a ReActionView page: a chat box in the tab
     # (<page-agent>, page_agent_tag) and an Action Cable channel that runs the
-    # model with TabView tools. It uses only the gem's public pieces, so it
-    # also serves as an example of wiring TabView to a transport.
+    # model with TabView tools. It is built from the gem's public pieces and
+    # shows one way to wire TabView to a transport.
     #
     #   RubyLLM::ReActionView::PageAgent.configure do |config|
     #     config.chat = -> { RubyLLM.chat(model: "gpt-5-mini") }
