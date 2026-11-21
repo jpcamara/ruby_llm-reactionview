@@ -16,8 +16,9 @@ module RubyLLM
     # win, because it knows what it changed since. Controllers read seeded
     # values with herb_state as usual.
     #
-    # This fills ReActionView's @__herb_state_overrides, which 0.6 reads only
-    # for refetches. It relies on that internal, so check it when upgrading.
+    # This sets ReActionView's @__herb_state_overrides, which 0.6 itself fills
+    # from the Herb-State header only on refetches, and reads on every render.
+    # It relies on that internal, so check it when upgrading.
     module Seeding
       extend ActiveSupport::Concern
 
