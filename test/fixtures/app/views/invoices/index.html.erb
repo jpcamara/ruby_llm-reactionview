@@ -1,0 +1,19 @@
+<%# herb:slots client %>
+<%# herb:state (status: "all", sort: "due", query: "", page: 1) %>
+<p><%= status.humanize %> by <%= sort.humanize %> <%= query.strip %> <%= page %></p>
+<button data-herb-set="status=all">All</button>
+<button data-herb-set="status=open">Open</button>
+<button data-herb-set="status=paid">Paid</button>
+<select data-herb-set="sort=$value">
+  <option value="due">Due</option>
+  <option value="amount">Amount</option>
+</select>
+<input value="<%= query %>" data-herb-set="query=$value">
+<table>
+  <% invoices.each do |invoice| %>
+    <%# herb:key invoice.id %>
+    <%# herb:state (expanded: false) %>
+    <tr data-herb-toggle="expanded"><td><%= invoice.number %></td></tr>
+    <tr data-open="<%= expanded %>"><td><%= invoice.notes %></td></tr>
+  <% end %>
+</table>
