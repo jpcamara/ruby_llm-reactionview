@@ -1,4 +1,4 @@
-// A fresh tab should open already in the shared view: no flash of defaults.
+// A fresh tab's first paint shows the shared view.
 import { chromium } from "playwright"
 const b = await chromium.launch(); const p = await b.newPage()
 const seen = []

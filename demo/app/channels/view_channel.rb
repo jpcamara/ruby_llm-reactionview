@@ -1,4 +1,4 @@
-# The workspace's view document, kept in memory instead of the database.
+# The workspace's view document, kept in memory.
 #
 # Which filter is on or which row is open matters only while people are
 # looking at the page, so this channel holds the document in a class-level
@@ -6,7 +6,7 @@
 # loses it until a browser reconnects and syncs its copy back. It is shared
 # only within one process.
 #
-# Y::DocumentChannel still checks the signed grant; only storage changes.
+# Y::DocumentChannel checks the signed grant.
 class ViewChannel < Y::DocumentChannel
   STATES = Concurrent::Map.new
 

@@ -5,7 +5,7 @@ class AgentsController < ApplicationController
     document = Workspace.default.collaborative_document(:view)
     url = "#{request.base_url.sub(/\Ahttp/, "ws")}/cable"
     origin = request.base_url
-    [ViewAgent, ViewAgent::View, InvoicesView, Invoice] # load them here, not in the thread
+    [ViewAgent, ViewAgent::View, InvoicesView, Invoice] # autoload them before the thread starts
     Thread.new do
       ViewAgent.run(document, url:, headers: { "Origin" => origin }, lock: nil, idle: 300)
     rescue StandardError => e

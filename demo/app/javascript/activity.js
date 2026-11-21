@@ -1,6 +1,5 @@
 // Who changed the shared view last, in the document's "activity" Y.Map, so
-// other people see a toast. Kept apart from the "view" map, which holds only
-// states.
+// other people see a toast. The "view" map holds the states themselves.
 import { toast } from "toast"
 import { parseKey } from "ruby_llm-reactionview/yjs"
 

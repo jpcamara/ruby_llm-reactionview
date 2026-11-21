@@ -1,7 +1,7 @@
 class InvoicesController < ApplicationController
   include RubyLLM::ReActionView::Seeding
 
-  # The page starts in the shared view, not the template defaults.
+  # The page starts in the shared view's states.
   seed_herb_states { InvoicesView.seeds(Workspace.default) }
 
   def index

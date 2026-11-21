@@ -1,4 +1,4 @@
-// apply() answers with the rows after a server refetch, not the ones before.
+// apply() answers with the rows a server refetch renders.
 import { chromium } from "playwright"
 const b = await chromium.launch()
 const p = await b.newPage()
