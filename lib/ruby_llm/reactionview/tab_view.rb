@@ -1,11 +1,11 @@
 module RubyLLM
   module ReActionView
     # A view backed by the browser tab showing the page. The tab holds the
-    # states, so the app writes no `look` or `set`: each call becomes a
-    # request to the tab, and its answer goes back to the model.
+    # states. Each call becomes a request to the tab, and its answer goes
+    # back to the model.
     #
     # The tab reports which templates it rendered, and the tools are built
-    # from those files on disk, so a tab can't widen what the model may set.
+    # from those files on disk, so the model may set only what they allow.
     # `request` sends a Hash to the tab ({ "type" => "look" } or
     # { "type" => "set", "changes" => [...] }) and returns its reply.
     class TabView

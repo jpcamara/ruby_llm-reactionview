@@ -1,5 +1,4 @@
 // Reads and sets a ReActionView page's Herb states through window.HerbRuntime.
-// No knowledge of agents or chat: this is the page's state as data.
 //
 // A template rendered more than once, or inside a keyed row, is "repeated":
 // each rendering is addressed by its row key.

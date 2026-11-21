@@ -1,7 +1,7 @@
 // ruby_llm-reactionview in the browser: what an agent can see and change on
 // this page, for answering a TabView's requests.
 //
-//   page.js      Herb state access (no agent code)
+//   page.js      Herb state access
 //   text.js      visible text
 //   snapshot.js  report(), snapshot() and apply()
 //

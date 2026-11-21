@@ -64,7 +64,7 @@ export async function apply(changes) {
 
 // When a change makes Herb refetch from the server (the state is one the
 // server reads), its refetcher has a pending timer right after setState.
-// Asking it for the same refetch joins that one rather than starting another,
+// Asking it for the same refetch joins that pending one,
 // and resolves once the new HTML is applied. A refetch superseded by a later
 // change comes back stale, so wait for the next. Returns null when no refetch
 // is pending, or when the runtime doesn't look like ReActionView 0.6's.

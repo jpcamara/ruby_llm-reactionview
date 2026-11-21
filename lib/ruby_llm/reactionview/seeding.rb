@@ -3,8 +3,8 @@ require "active_support/concern"
 module RubyLLM
   module ReActionView
     # Renders a page with state values the server already has, such as ones
-    # an agent set or a shared document holds, instead of the template
-    # defaults. The page then starts in that state with no flash.
+    # an agent set or a shared document holds. The first paint shows those
+    # states.
     #
     #   class InvoicesController < ApplicationController
     #     include RubyLLM::ReActionView::Seeding
@@ -27,8 +27,8 @@ module RubyLLM
         prepend_before_action :apply_herb_seeds
       end
 
-      # ReActionView no longer has the hook this fills, so seeds would be
-      # dropped without a word. Say so once.
+      # Called when ReActionView lacks the hook this fills. Seeds are dropped
+      # then, so this logs a warning once.
       def self.warn_unsupported(controller)
         return if @warned
 
