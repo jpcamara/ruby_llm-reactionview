@@ -26,6 +26,16 @@ module RubyLLM
         prepend_before_action :apply_herb_seeds
       end
 
+      # ReActionView no longer has the hook this fills, so seeds would be
+      # dropped without a word. Say so once.
+      def self.warn_unsupported(controller)
+        return if @warned
+
+        @warned = true
+        message = "RubyLLM::ReActionView::Seeding: this ReActionView has no __herb_state_overrides, so pages render with template defaults"
+        defined?(Rails) ? Rails.logger.warn(message) : Kernel.warn(message)
+      end
+
       class_methods do
         def seed_herb_states(&block) = self.herb_seeders += [block]
       end
@@ -33,7 +43,8 @@ module RubyLLM
       private
 
       def apply_herb_seeds
-        return if herb_seeders.empty? || !respond_to?(:__herb_state_overrides, true)
+        return if herb_seeders.empty?
+        return Seeding.warn_unsupported(self) unless respond_to?(:__herb_state_overrides, true)
 
         seeds = herb_seeders.map { |seeder| instance_exec(&seeder) || {} }
                             .reduce({}) { |all, more| all.deep_merge(more.deep_stringify_keys) }

@@ -142,6 +142,8 @@ end
 `View#seeds` returns Herb's override shape, `{ file => { name => value } }`.
 `herb_state` in the controller reads the seeded values, and the page paints in
 that state with no flash. When the tab refetches, the states it sends win.
+Seeding fills ReActionView's `@__herb_state_overrides`, an internal of 0.6,
+and logs a warning if it's gone.
 
 ## What it depends on
 
@@ -158,6 +160,7 @@ this gem uses from Herb isn't documented yet. Check these when upgrading.
 | `window.HerbRuntime.state`: `manifestFor`, `getState`, `setState` with a `{ region, item }` scope | `page.js`, `snapshot.js` | Not documented (the documented API is `useState(this)` for Stimulus) |
 | `window.HerbRuntime.slots`: `regions`, `itemsFor`, and a region's `file`, `version`, `occurrence`, `item`, `ranges` | `page.js`, `snapshot.js` | Not documented |
 | The `herb:slot-update` event | `snapshot.js` | Not documented |
+| `HerbRuntime.state.refetch` (`timer`, `request`) and `state.options.refetchDebounce`, to wait for a server refetch | `snapshot.js` | Internal; `apply()` falls back without it |
 
 **RubyLLM**
 
@@ -169,9 +172,17 @@ this gem uses from Herb isn't documented yet. Check these when upgrading.
 
 ## Known limits
 
-- Herb sends only page-level states to the server, so row states can't affect
-  server-rendered branches, and seeding covers page states only.
-- `apply()` waits for `herb:slot-update`, or 300 ms if none comes. A slow
-  refetch can land after it answers, so the model may see the previous rows.
+- **Row states start at their template default.** Herb sends only page-level
+  states to the server, so seeding covers page states only, and a row state
+  such as `expanded` can't change what the server renders. A row the agent
+  opened is closed again after a full page load, unless something in the
+  browser re-applies it.
+- **Seeding uses a ReActionView 0.6 internal.** It fills
+  `@__herb_state_overrides`. If an upgrade removes it, pages render with the
+  template defaults and Seeding logs a warning once.
+- **`apply()` reads Herb's refetcher directly** to wait for a server refetch
+  to land before answering. On a runtime without it, `apply()` falls back to
+  waiting for `herb:slot-update` or 300 ms, and the model may see rows from
+  before a slow refetch.
 
 Requires Herb 0.11, ReActionView 0.6 and RubyLLM 2.x.
